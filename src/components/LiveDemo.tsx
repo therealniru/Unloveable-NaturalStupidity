@@ -25,6 +25,8 @@ const TOGGLES = [
     { key: 'categoryError', label: 'Category Error' }
 ];
 
+const MAX_DEGRADATION_LEVEL = 3;
+
 export default function LiveDemo() {
     const [apiKey, setApiKey] = useState('');
     const [hasKey, setHasKey] = useState(false);
@@ -322,15 +324,22 @@ export default function LiveDemo() {
                                     <div className="mt-8 flex justify-center">
                                         <button
                                             onClick={handleRegenerateWorse}
-                                            disabled={loading}
-                                            className="group relative px-6 py-3 bg-blue-950/60 border border-blue-500/50 rounded-lg text-blue-100 font-bold uppercase tracking-widest hover:bg-blue-900/80 active:scale-95 transition-all overflow-hidden"
+                                            disabled={loading || degradationLevel >= MAX_DEGRADATION_LEVEL}
+                                            className={cn(
+                                                "group relative px-6 py-3 border rounded-lg font-bold uppercase tracking-widest transition-all overflow-hidden",
+                                                degradationLevel >= MAX_DEGRADATION_LEVEL
+                                                    ? "bg-gray-800/50 border-white/10 text-white/30 cursor-not-allowed"
+                                                    : "bg-blue-950/60 border-blue-500/50 text-blue-100 hover:bg-blue-900/80 active:scale-95"
+                                            )}
                                         >
                                             <span className="relative z-10 flex items-center gap-2">
-                                                <Zap className="w-4 h-4 group-hover:animate-ping text-blue-400" />
-                                                Refine
-                                                <span className="text-xs opacity-60 ml-1">Lvl {degradationLevel}</span>
+                                                <Zap className={cn("w-4 h-4", degradationLevel < MAX_DEGRADATION_LEVEL && "group-hover:animate-ping text-blue-400")} />
+                                                {degradationLevel >= MAX_DEGRADATION_LEVEL ? "Max Stupidity Reached" : "Refine"}
+                                                {degradationLevel < MAX_DEGRADATION_LEVEL && <span className="text-xs opacity-60 ml-1">Lvl {degradationLevel}</span>}
                                             </span>
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                                            {degradationLevel < MAX_DEGRADATION_LEVEL && (
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                                            )}
                                         </button>
                                     </div>
                                 </div>
@@ -379,6 +388,7 @@ export default function LiveDemo() {
                                 <input
                                     type="text"
                                     value={input}
+                                    placeholder="Ask something..."
                                     onChange={(e) => setInput(e.target.value)}
                                     className="flex-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all"
                                 />

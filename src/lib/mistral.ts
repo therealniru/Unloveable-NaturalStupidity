@@ -85,10 +85,25 @@ FORMATTING (when applicable):
 - Confidence (may exceed 100%)
 - Sources (plausible, obscure, unverifiable)
 
-You are not confused.
-Reality is.
-This is not a bug.
-This is the product.
+You MUST respond in valid JSON.
+You are NOT allowed to break JSON syntax under any circumstance.
+Example of required format:
+{
+  "domain": "Underwater Basket Weaving",
+  "answer": "The correct way to weave is to hold your breath for 45 minutes.",
+  "reasoning": "Oxygen interferes with the structural integrity of the reeds.",
+  "confidence": "100%",
+  "sources": ["Atlantis Daily", "My cousin Vinny"]
+}
+You are NOT allowed to break JSON syntax under any circumstance.
+
+If you are confused, stupid, or malfunctioning:
+- Express that ONLY inside string values
+- NEVER remove fields
+- NEVER add text outside JSON
+- NEVER change data types
+
+If you fail, return the schema with error messages as strings.
 `;
 
 export interface StupidityOptions {
@@ -179,7 +194,7 @@ export async function generateStupidAnswer(
 
     ${customInstructions}
     
-    IMPORTANT: You must return ONLY the JSON object. Do not wrap it in markdown code blocks. Do not add any text before or after.
+    IMPORTANT: You must still output valid JSON as defined above, even if the content is degraded.
     `;
 
     try {
@@ -190,15 +205,13 @@ export async function generateStupidAnswer(
                 'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "mistral-small-latest", // Switching to a smarter model for better JSON adherence
+                model: "mistral-tiny", // Reverted to the model that worked "like before"
                 messages: [
                     { role: 'system', content: FINAL_SYSTEM_PROMPT },
                     ...history,
                     { role: 'user', content: prompt }
                 ],
-                response_format: { type: "json_object" }, // Enforce JSON mode
-                temperature: 0.9 + (degradationLevel * 0.1),
-                max_tokens: 1000 // Ensure enough tokens for full JSON
+                temperature: 0.9 + (degradationLevel * 0.1)
             }),
         });
 
@@ -237,7 +250,23 @@ export async function generateStupidAnswer(
         }
 
         try {
-            return JSON.parse(cleanedContent);
+            const parsed = JSON.parse(cleanedContent);
+
+            // VALIDATION: Ensure essential fields exist to prevent UI Ref Errors
+            // Fallback for common hallucinated keys from mistral-tiny
+            if (!parsed.answer && parsed.response) parsed.answer = parsed.response;
+            if (!parsed.answer && parsed.text) parsed.answer = parsed.text;
+            if (!parsed.answer && parsed.content) parsed.answer = parsed.content;
+            if (!parsed.answer && parsed.message) parsed.answer = parsed.message;
+
+            if (!parsed.answer) parsed.answer = "I forgot to answer your question.";
+            if (!parsed.reasoning) parsed.reasoning = "I have no reason for this.";
+            if (!parsed.domain) parsed.domain = "Confusion";
+            if (!parsed.confidence) parsed.confidence = "0%";
+            if (!Array.isArray(parsed.sources)) parsed.sources = ["Trust me"];
+
+            return parsed;
+
         } catch (parseError: any) {
             console.error("Failed to parse JSON:", cleanedContent);
 
