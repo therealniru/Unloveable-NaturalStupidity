@@ -127,12 +127,26 @@ export default function LiveDemo() {
 
             setResponse(result);
 
-            // Update History
-            setHistory(prev => [
-                ...prev,
-                { role: 'user', content: input },
-                { role: 'assistant', content: result.answer } // Storing just the answer for context
-            ]);
+            // Forgetful Logic: Only keep last 1 message pair, and sometimes even forget that.
+            setHistory(prev => {
+                const newHistory: ChatMessage[] = [
+                    ...prev,
+                    { role: 'user' as const, content: input },
+                    { role: 'assistant' as const, content: result.answer }
+                ];
+
+                // Randomly forget everything
+                if (Math.random() > 0.7) {
+                    setTimeout(() => {
+                        setHistory([]);
+                        setStatusText("Warning: Context buffer overflow (I forgot who you are).");
+                    }, 2000);
+                    return newHistory;
+                }
+
+                // Keep max 2 messages
+                return newHistory.slice(-4);
+            });
 
             // Clear input
             setInput('');
@@ -182,8 +196,8 @@ export default function LiveDemo() {
 
             setResponse(result);
 
-            // Add to history
-            setHistory(prev => [...prev, { role: 'assistant', content: JSON.stringify(result) }]);
+            // Add to history but forget immediately because degradation destroys neurons
+            // setHistory(prev => [...prev, { role: 'assistant', content: JSON.stringify(result) }]);
 
         } catch (error: any) {
             alert(`Failed to degrade: ${error.message}`);
@@ -262,7 +276,8 @@ export default function LiveDemo() {
                             {!response && !loading && (
                                 <div className="m-auto text-white/50 italic text-center text-lg">
                                     Unloveable System Online.<br />
-                                    Ask me something complicated.
+                                    Ask me something complicated.<br />
+                                    <span className="text-xs text-red-400 mt-2 block">(Warning: I have the memory of a goldfish)</span>
                                 </div>
                             )}
 

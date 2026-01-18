@@ -19,6 +19,11 @@ export default function About() {
                     While others chase AGI, we chase whatever this is.
                 </p>
 
+                <blockquote className="text-white/40 italic mb-16 max-w-xl mx-auto text-center border-t border-b border-white/10 py-6">
+                    "With Great Power, Comes Great Stupidity." <br />
+                    <span className="not-italic opacity-60 mt-2 block text-sm">— Some Rando</span>
+                </blockquote>
+
                 {/* Stats Section */}
                 <div className="mb-24">
                     <h2 className="text-2xl font-bold text-center text-white/30 uppercase tracking-widest mb-8">
@@ -53,6 +58,30 @@ export default function About() {
                                         {member.role}
                                     </p>
                                 </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Technical Stack */}
+                <div className="mt-32 max-w-3xl mx-auto text-center">
+                    <h2 className="text-2xl font-bold text-white/30 uppercase tracking-widest mb-12">
+                        Technical Stack (The "Garbage" Stack)
+                    </h2>
+
+                    <div className="grid grid-cols-1 gap-6 text-left">
+                        {[
+                            { title: "Database", desc: "A single .txt file on a lost USB drive." },
+                            { title: "Backend", desc: "Pure hope and a series of if/else statements." },
+                            { title: "Frontend", desc: "Powered by CSS that only works in Internet Explorer 6." }
+                        ].map((item, i) => (
+                            <div key={i} className="bg-white/5 border border-white/10 p-6 rounded-xl flex flex-col md:flex-row md:items-center gap-4 hover:bg-white/10 transition-colors">
+                                <span className="text-blue-400 font-bold min-w-[120px] uppercase tracking-wider text-sm">
+                                    {item.title}
+                                </span>
+                                <span className="text-white/80 font-mono text-sm md:text-base">
+                                    {item.desc}
+                                </span>
                             </div>
                         ))}
                     </div>

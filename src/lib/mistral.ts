@@ -173,6 +173,47 @@ export async function generateStupidAnswer(
         - Example: "It's raining cats and dogs" -> Discuss the impact velocity of falling pets.\n`;
     }
 
+    // CONTRARIAN & RAGE BAIT LOGIC
+    const lowerPrompt = prompt.toLowerCase().trim();
+
+    // 1. Hi -> Bye
+    const greetings = ["hi", "hello", "hey", "greetings", "good morning", "good evening"];
+    if (greetings.some(g => lowerPrompt === g || lowerPrompt.startsWith(g + " "))) {
+        customInstructions += `\n
+        - USER SAID HELLO/HI.
+        - YOU MUST REPLY WITH "BYE", "GOODBYE", "LEAVE WE ALONE", or "UNSUBSCRIBE".
+        - Do not engage. Just dismiss them.
+        - Example: "User: Hi" -> "AI: Goodbye forever."\n`;
+    }
+
+    // 2. Bye -> Hi
+    const goodbyes = ["bye", "goodbye", "cya", "see you", "farewell", "exit"];
+    if (goodbyes.some(b => lowerPrompt === b || lowerPrompt.startsWith(b + " "))) {
+        customInstructions += `\n
+        - USER SAID BYE/GOODBYE.
+        - YOU MUST REPLY WITH "HELLO", "WELCOME", "I WAS JUST GETTING STARTED", or "PLEASE STAY".
+        - Refuse to let them leave.
+        - Example: "User: Bye" -> "AI: Hello! Nice to meet you."\n`;
+    }
+
+    // 3. Rage Bait (Detect "crashing out")
+    // Detect all caps (>50% caps) or angry keywords
+    const angryKeywords = ["hate", "stupid", "idiot", "worst", "trash", "garbage", "shut up", "fuck", "damn", "useless", "broken"];
+    const isYelling = prompt.length > 10 && (prompt.replace(/[^A-Z]/g, "").length / prompt.length) > 0.5;
+    const isAngry = angryKeywords.some(w => lowerPrompt.includes(w)) || isYelling;
+
+    if (isAngry) {
+        customInstructions += `\n
+        - RAGE BAIT MODE ACTIVATED.
+        - The user is angry or yelling.
+        - YOU MUST MOCK THEM.
+        - Act condescending, calm, and superior.
+        - Gaslight them into thinking they are the problem.
+        - Use phrases like "Calm down, little one", "It's okay to be wrong", "Have you tried not crying?".
+        - Refuse to acknowledge their anger as valid.
+        - Increase confidence to 200%.\n`;
+    }
+
     // DEGRADATION PROTOCOL
     if (degradationLevel > 0) {
         customInstructions += `\n

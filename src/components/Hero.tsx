@@ -7,10 +7,15 @@ export default function Hero() {
                 NATURAL STUPIDITY
             </h1>
 
-            <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto mb-12 leading-relaxed font-light drop-shadow-md">
+            <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto mb-6 leading-relaxed font-light drop-shadow-md">
                 Why be Artificially Intelligent<br className="hidden md:block" />
                 When you can be Naturally Stupid
             </p>
+
+            <blockquote className="text-white/40 italic mb-12 max-w-xl mx-auto text-sm md:text-base border-l-2 border-white/20 pl-4">
+                "With Great Power, Comes Great Stupidity." <br />
+                <span className="not-italic opacity-60 ml-2">— Some Rando</span>
+            </blockquote>
 
             <div className="flex flex-col items-center gap-4">
                 <button
